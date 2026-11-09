@@ -15,7 +15,7 @@ function renderArcade(data, t) {
   const scr = { x: 44, y: 100, w: 512, h: 280 };
   const hudH = 36;
   const fx = scr.x, fw = scr.w, fy = scr.y + hudH, baseY = scr.y + scr.h;
-  const caption = 'Each column is one of my last 26 weeks: the taller the column, the more contributions that week. Hearts mark my busiest weeks and the number is that week\'s contributions. CONTRIBS = total over these 26 weeks, STREAK = days in a row with contributions, YEARS = time on GitHub.';
+  const caption = 'Each column is one of my last 26 weeks: the taller the column, the more contributions that week. Hearts mark my busiest weeks and the number is that week\'s contributions.';
   const capLines = wrapText(caption, 508, 12);
   const capTop = bz.y + bz.h + 12;
   const capBottom = capTop + capLines.length * 16;
