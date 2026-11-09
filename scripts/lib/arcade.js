@@ -15,8 +15,8 @@ function renderArcade(data, t) {
   const scr = { x: 44, y: 100, w: 512, h: 280 };
   const hudH = 36;
   const fx = scr.x, fw = scr.w, fy = scr.y + hudH, baseY = scr.y + scr.h;
-  const caption = 'Levelnya adalah 26 minggu kontribusi terakhirku; koin menandai minggu tersibuk.';
-  const capLines = wrapText(caption, 500, 12);
+  const caption = 'Each column is one of my last 26 weeks: the taller the column, the more contributions that week. Hearts mark my busiest weeks and the number is that week\'s contributions. CONTRIBS = total over these 26 weeks, STREAK = days in a row with contributions, YEARS = time on GitHub.';
+  const capLines = wrapText(caption, 508, 12);
   const capTop = bz.y + bz.h + 12;
   const capBottom = capTop + capLines.length * 16;
   const panelY = capBottom + 12, panelH = 88;
@@ -152,8 +152,8 @@ function renderArcade(data, t) {
   });
 
   if (!coins.length) {
-    g.push(text('Belum ada koin di level ini', fx + fw / 2, fy + 56, { size: 14, fill: sc.sub, anchor: 'middle' }, t));
-    g.push(text('Satu commit saja sudah cukup untuk memunculkannya', fx + fw / 2, fy + 76, { size: 12, fill: sc.sub, anchor: 'middle' }, t));
+    g.push(text('No coins in this level yet', fx + fw / 2, fy + 56, { size: 14, fill: sc.sub, anchor: 'middle' }, t));
+    g.push(text('One contribution is enough to spawn one', fx + fw / 2, fy + 76, { size: 12, fill: sc.sub, anchor: 'middle' }, t));
   }
 
   const coinShape = (c, scl) =>
@@ -192,17 +192,19 @@ function renderArcade(data, t) {
   b.push(`<rect x="${scr.x}" y="${scr.y}" width="${scr.w}" height="${hudH}" fill="${t.screenBg}"/><path d="M${scr.x} ${scr.y + hudH - 0.5}H${scr.x + scr.w}" stroke="${sc.border}"/>`);
   const hy = scr.y + (hudH - 14) / 2;
   b.push(`<g transform="translate(${scr.x + 26} ${scr.y + hudH / 2})"><g clip-path="url(#c10)"><use href="#avd" xlink:href="#avd" transform="translate(-10 -10) scale(.2083)"/></g><circle r="10.5" fill="none" stroke="${sc.border}"/></g>`);
-  const sTxt = 'SKOR ';
-  b.push(pixelText(sTxt, scr.x + 44, hy, 2, sc.sub));
-  b.push(pixelText(pad(st.score, 5), scr.x + 44 + pixelWidth(sTxt, 2), hy, 2, sc.text));
-  b.push(pixelText('LEVEL ', scr.x + scr.w / 2 - 38, hy, 2, sc.sub));
-  b.push(pixelText(pad(st.level, 2), scr.x + scr.w / 2 - 38 + pixelWidth('LEVEL ', 2), hy, 2, sc.text));
-  const lives = String(st.streak);
+  // kiri: total kontribusi 26 minggu. tengah: tahun di GitHub. kanan: streak hari berturut-turut
+  const lbl = 'CONTRIBS ';
+  b.push(pixelText(lbl, scr.x + 44, hy, 2, sc.sub));
+  b.push(pixelText(String(st.score), scr.x + 44 + pixelWidth(lbl, 2), hy, 2, sc.text));
+  const cxm = scr.x + scr.w / 2 + 22;
+  b.push(pixelText('YEARS ', cxm, hy, 2, sc.sub));
+  b.push(pixelText(String(st.level), cxm + pixelWidth('YEARS ', 2), hy, 2, sc.text));
+  const lives = st.streak + 'D';
   const rEnd = scr.x + scr.w - 16;
-  const livesW = pixelWidth('X' + lives, 2);
-  b.push(pixelText('X' + lives, rEnd, hy, 2, sc.text, { anchor: 'end' }));
+  const livesW = pixelWidth(lives, 2);
+  b.push(pixelText(lives, rEnd, hy, 2, sc.text, { anchor: 'end' }));
   b.push(icon('heartFill', rEnd - livesW - 22, hy - 1, 16, t.accent.red));
-  b.push(pixelText('NYAWA', rEnd - livesW - 28, hy, 2, sc.sub, { anchor: 'end' }));
+  b.push(pixelText('STREAK', rEnd - livesW - 28, hy, 2, sc.sub, { anchor: 'end' }));
   b.push('</g>');
 
   // ---- caption ----
@@ -225,7 +227,7 @@ function renderArcade(data, t) {
   // tombol Mulai seperti tombol Follow
   const sbw = 104;
   b.push(`<rect x="${f(W / 2 - sbw / 2)}" y="${py - 18}" width="${sbw}" height="36" rx="18" fill="${t.btnBg}"/>`);
-  b.push(pixelText('MULAI', W / 2, py - 7, 2, t.btnText, { anchor: 'middle' }));
+  b.push(pixelText('START', W / 2, py - 7, 2, t.btnText, { anchor: 'middle' }));
 
   // dua tombol: A menekan saat lompat, B menekan saat koin diambil
   const press = (times) => {
@@ -241,8 +243,8 @@ function renderArcade(data, t) {
     b.push(`<g class="m"><g><circle cx="${bx}" cy="${py}" r="13" fill="${col}"/>${press(times)}</g></g>`);
   });
 
-  const desc = `Level platformer dari kontribusi 26 minggu terakhir. Skor ${st.score}, nyawa ${st.streak} hari streak, level ${st.level}. ${coins.length} koin menandai minggu tersibuk.`;
-  return svgDoc({ w: W, h: H, t, defs: defs.join(''), css, body: b.join(''), title: 'Arcade kontribusi', desc });
+  const desc = `Platformer level built from my last 26 weeks of contributions: ${st.score} contributions, a ${st.streak}-day streak, ${st.level} years on GitHub. ${coins.length} hearts mark the busiest weeks.`;
+  return svgDoc({ w: W, h: H, t, defs: defs.join(''), css, body: b.join(''), title: 'Contribution arcade', desc });
 }
 
 module.exports = { renderArcade };

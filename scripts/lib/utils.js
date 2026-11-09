@@ -88,38 +88,40 @@ function wrapText(text, maxW, size, opts = {}) {
 }
 
 // ---------- Angka dan tanggal Indonesia ----------
-const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-function thousands(n) { return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+function thousands(n) { return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
 
-// 1234 -> "1,2 rb", 15300 -> "15 rb", 2300000 -> "2,3 jt"
+// 1234 -> "1.2K", 15300 -> "15K", 2300000 -> "2.3M"
 function shortNum(n) {
   n = Math.max(0, Number(n) || 0);
-  const fmt = (v) => (v < 10 ? v.toFixed(1).replace('.', ',').replace(/,0$/, '') : String(Math.round(v)));
-  if (n >= 1e6) return fmt(n / 1e6) + ' jt';
-  if (n >= 1e3) return fmt(n / 1e3) + ' rb';
+  const fmt = (v) => (v < 10 ? v.toFixed(1).replace(/\.0$/, '') : String(Math.round(v)));
+  if (n >= 1e6) return fmt(n / 1e6) + 'M';
+  if (n >= 1e3) return fmt(n / 1e3) + 'K';
   return String(Math.round(n));
 }
 
-const pct1 = (p) => p.toFixed(1).replace('.', ',');
+const pct1 = (p) => p.toFixed(1);
+const plural = (n, word) => (n === 1 ? word : word + 's');
 const pad = (n, len) => String(Math.max(0, Math.round(n))).padStart(len, '0');
 
 function joinedID(iso) {
   const d = new Date(iso);
   if (isNaN(d)) return '';
-  return 'Bergabung ' + MONTHS[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
+  return 'Joined ' + MONTHS[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
 }
 
 function relativeTimeID(iso, now) {
   const diff = Math.max(0, (now - new Date(iso).getTime()) / 1000);
   if (!Number.isFinite(diff)) return '';
-  if (diff < 60) return 'baru saja';
-  if (diff < 3600) return Math.floor(diff / 60) + ' menit lalu';
-  if (diff < 86400) return Math.floor(diff / 3600) + ' jam lalu';
-  if (diff < 86400 * 30) return Math.floor(diff / 86400) + ' hari lalu';
-  if (diff < 86400 * 365) return Math.floor(diff / (86400 * 30)) + ' bulan lalu';
-  return Math.floor(diff / (86400 * 365)) + ' tahun lalu';
+  const ago = (n, unit) => n + ' ' + plural(n, unit) + ' ago';
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return ago(Math.floor(diff / 60), 'minute');
+  if (diff < 86400) return ago(Math.floor(diff / 3600), 'hour');
+  if (diff < 86400 * 30) return ago(Math.floor(diff / 86400), 'day');
+  if (diff < 86400 * 365) return ago(Math.floor(diff / (86400 * 30)), 'month');
+  return ago(Math.floor(diff / (86400 * 365)), 'year');
 }
 
 // ---------- PRNG dan hash ----------
@@ -234,7 +236,7 @@ function validateSvg(svg, name) {
 
 module.exports = {
   esc, f, clamp, lerp, textWidth, truncate, wrapText,
-  MONTHS, MONTHS_SHORT, thousands, shortNum, pct1, pad, joinedID, relativeTimeID,
+  MONTHS, MONTHS_SHORT, thousands, shortNum, pct1, plural, pad, joinedID, relativeTimeID,
   hashSeed, mulberry32, hexToRgb, luminance, mix, visibleOn,
   REDUCED_CSS, svgDoc, text, validateSvg,
 };

@@ -12,19 +12,19 @@ function renderLangs(data, t) {
   const H = cardH + 16;
 
   body.push(`<rect x="${CX}" y="8" width="${CW}" height="${cardH}" rx="${t.radius}" fill="${t.surface}"/>`);
-  body.push(text('Bahasa yang sering kupakai', CX + PAD, 8 + 36, { size: 20, weight: 800, fill: t.text }, t));
+  body.push(text('Languages I use most', CX + PAD, 8 + 36, { size: 20, weight: 800, fill: t.text }, t));
 
   if (!top.length) {
-    body.push(text('Belum ada kode yang terbaca', CX + PAD, 8 + headH + 22, { size: 15, weight: 700, fill: t.text }, t));
-    body.push(text('Begitu ada repo dengan kode, barisnya muncul di sini', CX + PAD, 8 + headH + 44, { size: 13, fill: t.sub }, t));
+    body.push(text('No code detected yet', CX + PAD, 8 + headH + 22, { size: 15, weight: 700, fill: t.text }, t));
+    body.push(text('Once a repo has code, its row shows up here', CX + PAD, 8 + headH + 44, { size: 13, fill: t.sub }, t));
   }
 
   top.forEach((l, i) => {
     const y0 = 8 + headH + i * rowH;
     const color = visibleOn(l.color, t.mode);
-    body.push(text(`${i + 1} · Bahasa pemrograman`, CX + PAD, y0 + 14, { size: 13, fill: t.sub }, t));
+    body.push(text(`${i + 1} · Programming language`, CX + PAD, y0 + 14, { size: 13, fill: t.sub }, t));
     body.push(text(truncate(l.name, CW - 2 * PAD - 100, 15, { bold: true }), CX + PAD, y0 + 36, { size: 15, weight: 700, fill: t.text }, t));
-    body.push(text(`${pct1(l.pct)}% kode`, CX + CW - PAD, y0 + 36, { size: 13, fill: t.sub, anchor: 'end' }, t));
+    body.push(text(`${pct1(l.pct)}% of code`, CX + CW - PAD, y0 + 36, { size: 13, fill: t.sub, anchor: 'end' }, t));
     const bw = CW - 2 * PAD;
     body.push(`<rect x="${CX + PAD}" y="${y0 + 44}" width="${bw}" height="4" rx="2" fill="${t.border}"/>`);
     const fw = Math.max(4, (bw * l.pct) / 100);
@@ -33,8 +33,8 @@ function renderLangs(data, t) {
 
   return svgDoc({
     w: W, h: H, t, body: body.join(''),
-    title: 'Bahasa pemrograman',
-    desc: top.length ? 'Bahasa terbanyak: ' + top.map((l) => `${l.name} ${pct1(l.pct)}%`).join(', ') : 'Belum ada data bahasa.',
+    title: 'Programming languages',
+    desc: top.length ? 'Top languages: ' + top.map((l) => `${l.name} ${pct1(l.pct)}%`).join(', ') : 'No language data yet.',
   });
 }
 

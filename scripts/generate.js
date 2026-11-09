@@ -30,25 +30,36 @@ const COMPONENTS = [
 // Bio branding: pakai teks dari profile.config.json kalau diisi, kalau tidak dirangkai dari data GitHub.
 // Bio dari akun GitHub sengaja tidak dipakai.
 function autoBio(data) {
-  const { thousands } = require('./lib/utils');
   const langs = data.langs.slice(0, 3).map((l) => l.name);
-  const stars = data.repos.reduce((a, r) => a + r.stars, 0);
   const head = langs.length
-    ? 'Developer yang sehari-hari pakai ' + (langs.length > 1 ? langs.slice(0, -1).join(', ') + ' dan ' + langs[langs.length - 1] : langs[0]) + '.'
-    : 'Developer yang baru mulai mengisi portofolio.';
-  const tail = [`${thousands(data.user.publicRepos)} repo publik`];
-  if (stars) tail.push(`${thousands(stars)} bintang`);
-  tail.push(`${Math.max(1, data.stats.years)} tahun di GitHub`);
-  return head + ' ' + tail.join(', ') + '.';
+    ? 'Developer who works with ' + (langs.length > 1 ? langs.slice(0, -1).join(', ') + ' and ' + langs[langs.length - 1] : langs[0]) + '.'
+    : 'Developer just getting started.';
+  return head;
 }
-function loadBio(data) {
+// Baca profile.config.json: bio custom dan tautan portofolio (url + show).
+function readConfig() {
   try {
-    const cfg = JSON.parse(fs.readFileSync(path.join(ROOT, 'profile.config.json'), 'utf8'));
-    if (cfg && typeof cfg.bio === 'string' && cfg.bio.trim()) return cfg.bio.trim();
+    return JSON.parse(fs.readFileSync(path.join(ROOT, 'profile.config.json'), 'utf8')) || {};
   } catch (e) {
-    if (e.code !== 'ENOENT') console.warn('Peringatan: profile.config.json tidak valid (' + e.message + '), pakai bio otomatis');
+    if (e.code !== 'ENOENT') console.warn('Peringatan: profile.config.json tidak valid (' + e.message + '), pakai pengaturan bawaan');
+    return {};
   }
-  return autoBio(data);
+}
+
+function loadBio(cfg, data) {
+  return typeof cfg.bio === 'string' && cfg.bio.trim() ? cfg.bio.trim() : autoBio(data);
+}
+
+// Tautan portofolio tampil hanya kalau show = true dan url berupa http(s).
+function loadPortfolio(cfg) {
+  const p = cfg.portfolio;
+  if (!p || p.show !== true) return null;
+  const url = typeof p.url === 'string' ? p.url.trim() : '';
+  if (!/^https?:\/\/[^\s]+$/i.test(url)) {
+    console.warn('Peringatan: portfolio.show true tapi url kosong atau bukan http(s), tautan dilewati');
+    return null;
+  }
+  return { url, label: url.replace(/^https?:\/\//i, '').replace(/\/$/, '') };
 }
 
 function picture(name, alt) {
@@ -58,17 +69,17 @@ function picture(name, alt) {
 // README dibuat dari data supaya tautan kartu repo selalu menunjuk repo yang benar.
 function buildReadme(data) {
   const u = data.user;
-  const parts = [`<a href="${esc(u.htmlUrl)}">\n${picture('profile', 'Profil GitHub ' + (u.name || u.login))}\n</a>`];
+  const parts = [`<a href="${esc(u.htmlUrl)}">\n${picture('profile', 'GitHub profile of ' + (u.name || u.login))}\n</a>`];
   for (let i = 0; i < 4; i++) {
     const r = data.featured[i];
-    const img = picture(`repo-${i + 1}`, r ? 'Repo ' + r.name : 'Slot repo kosong');
+    const img = picture(`repo-${i + 1}`, r ? 'Repo ' + r.name : 'Empty repo slot');
     parts.push(r ? `<a href="${esc(r.url)}">\n${img}\n</a>` : img);
   }
-  parts.push(picture('arcade', 'Arcade: level platformer dari kontribusi 26 minggu terakhir'));
-  parts.push(picture('arcade-scores', 'Papan skor repo dengan bintang terbanyak'));
-  parts.push(picture('solar', 'Tata surya: planet adalah bahasa, komet adalah push terbaru'));
-  parts.push(picture('langs', 'Bahasa pemrograman yang sering dipakai'));
-  parts.push(picture('contributions', 'Aktivitas kontribusi setahun terakhir'));
+  parts.push(picture('arcade', 'Arcade game built from my last 26 weeks of contributions'));
+  parts.push(picture('arcade-scores', 'Top scores: repos with the most stars'));
+  parts.push(picture('solar', 'Solar system: planets are languages, comets are recent pushes'));
+  parts.push(picture('langs', 'Most used programming languages'));
+  parts.push(picture('contributions', 'Contribution activity in the last year'));
   return `<div align="center">\n\n${parts.join('\n\n')}\n\n</div>\n`;
 }
 
@@ -82,7 +93,9 @@ async function main() {
     data = await loadData(LOGIN, process.env.GITHUB_TOKEN);
   }
 
-  data.bio = loadBio(data);
+  const cfg = readConfig();
+  data.bio = loadBio(cfg, data);
+  data.portfolio = loadPortfolio(cfg);
 
   // banner opsional: taruh file banner.png/jpg/jpeg/webp di root repo, otomatis di-embed
   const mimes = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp' };

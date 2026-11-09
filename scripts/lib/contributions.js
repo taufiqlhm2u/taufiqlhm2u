@@ -23,8 +23,8 @@ function renderContributions(data, t) {
   const H = cardH + 16;
 
   body.push(`<rect x="${CX}" y="${top}" width="${CW}" height="${cardH}" rx="${t.radius}" fill="${t.surface}"/>`);
-  body.push(text('Aktivitas kontribusi', CX + PAD, headY, { size: 20, weight: 800, fill: t.text }, t));
-  body.push(text(`${thousands(data.calendar.total)} kontribusi dalam setahun terakhir`, CX + PAD, headY + 22, { size: 14, fill: t.sub }, t));
+  body.push(text('Contribution activity', CX + PAD, headY, { size: 20, weight: 800, fill: t.text }, t));
+  body.push(text(`${thousands(data.calendar.total)} contributions in the last year`, CX + PAD, headY + 22, { size: 14, fill: t.sub }, t));
 
   // label bulan di minggu pertama tiap bulan, dilewati kalau terlalu rapat
   let prevMonth = -1, prevX = -100;
@@ -52,17 +52,17 @@ function renderContributions(data, t) {
 
   // legenda
   const rx = CX + CW - PAD;
-  let lx = rx - textWidth('Banyak', 12) ;
-  body.push(text('Banyak', rx, legendY + 16, { size: 12, fill: t.sub, anchor: 'end' }, t));
+  let lx = rx - textWidth('More', 12);
+  body.push(text('More', rx, legendY + 16, { size: 12, fill: t.sub, anchor: 'end' }, t));
   const swatches = [t.heatEmpty].concat(t.heat);
   lx -= 8 + swatches.length * 14;
   swatches.forEach((c, i) => body.push(`<rect x="${f(lx + i * 14)}" y="${legendY + 6}" width="10" height="10" rx="2" fill="${c}"/>`));
-  body.push(text('Sedikit', lx - 8, legendY + 16, { size: 12, fill: t.sub, anchor: 'end' }, t));
+  body.push(text('Less', lx - 8, legendY + 16, { size: 12, fill: t.sub, anchor: 'end' }, t));
 
   return svgDoc({
     w: W, h: H, t, body: body.join(''),
-    title: 'Aktivitas kontribusi',
-    desc: `${data.calendar.total} kontribusi dalam setahun terakhir.`,
+    title: 'Contribution activity',
+    desc: `${data.calendar.total} contributions in the last year.`,
   });
 }
 

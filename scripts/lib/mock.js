@@ -24,16 +24,16 @@ function mockData(kind, now = Date.now()) {
   let all = [];
   if (full) {
     all = [
-      mk('sistem-informasi-akademik', 'Aplikasi akademik kampus dengan dashboard nilai, jadwal kuliah, dan presensi mahasiswa berbasis Laravel', 1243, 310, 'PHP', 1),
-      mk('portfolio-v3', 'Website portofolio pribadi', 87, 12, 'TypeScript', 3),
-      mk('kota-bot', 'Bot Telegram untuk cek jadwal sholat dan cuaca kota Semarang', 54, 9, 'Python', 40),
+      mk('sistem-informasi-akademik', 'Campus academic app with grade dashboard, class schedule and attendance, built on Laravel', 1243, 310, 'PHP', 1),
+      mk('portfolio-v3', 'Personal portfolio website', 87, 12, 'TypeScript', 3),
+      mk('kota-bot', 'Telegram bot for prayer times and weather in Semarang', 54, 9, 'Python', 40),
       mk('dotfiles', '', 31, 3, 'Shell', 9),
-      mk('catatan-kuliah', 'Catatan kuliah semester 1 sampai 6', 12, 1, 'HTML', 200, true),
-      mk('belajar-rust', 'Latihan Rust', 4, 0, 'Rust', 12),
-      mk('toko-online-lama', 'Proyek lama, sudah tidak dipakai', 2, 0, 'JavaScript', 500, true),
+      mk('catatan-kuliah', 'Lecture notes for semesters 1 to 6', 12, 1, 'HTML', 200, true),
+      mk('belajar-rust', 'Rust exercises', 4, 0, 'Rust', 12),
+      mk('toko-online-lama', 'Old project, no longer used', 2, 0, 'JavaScript', 500, true),
     ];
   } else if (!empty) {
-    all = [mk('hello-world', 'Repo pertamaku', 1, 0, 'JavaScript', 2)];
+    all = [mk('hello-world', 'My first repo', 1, 0, 'JavaScript', 2)];
   }
 
   const langs = full
@@ -70,7 +70,7 @@ function mockData(kind, now = Date.now()) {
     user: {
       name: full ? 'Taufiq Hidayat Muhammad' : empty ? '' : 'Taufiq',
       login: 'taufiqlhm2u',
-      bio: full ? 'Mahasiswa Teknik Informatika yang suka ngoprek backend, otomatisasi, dan hal-hal kecil yang bikin hidup lebih gampang. Ngopi dulu, ngoding kemudian.' : empty ? '' : 'Baru mulai belajar ngoding',
+      bio: full ? 'Computer science student who loves tinkering with backend, automation and small tools that make life easier.' : empty ? '' : 'Just started learning to code',
       avatar: avatar(), avatarSmall: avatar(),
       location: full ? 'Semarang, Indonesia' : '', blog: full ? 'https://taufiq.dev' : '',
       createdAt: created, followers: full ? 1342 : 0, following: full ? 98 : 3, publicRepos: all.length,

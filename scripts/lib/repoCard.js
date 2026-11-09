@@ -23,23 +23,23 @@ function renderRepoCard(data, t, index) {
   body.push(text(handle, hx, y + 15, { size: 15, fill: t.sub }, t));
   hx += textWidth(handle, 15) + 4;
   if (repo && repo.pushedAt) {
-    const when = '· diperbarui ' + relativeTimeID(repo.pushedAt, data.now);
+    const when = '· updated ' + relativeTimeID(repo.pushedAt, data.now);
     body.push(text(truncate(when, W - 16 - hx, 15), hx, y + 15, { size: 15, fill: t.sub }, t));
   }
   y += 24;
 
   if (!repo) {
     // slot kosong, tetap rapi kalau repo kurang dari 4
-    body.push(text('Slot ini masih kosong', X, y + 17, { size: 17, weight: 700, fill: t.sub }, t));
+    body.push(text('Empty slot', X, y + 17, { size: 17, weight: 700, fill: t.sub }, t));
     y += 24;
-    for (const line of wrapText('Pin repo di profil GitHub, nanti kartunya muncul di sini sendiri.', CW, 15)) {
+    for (const line of wrapText('Pin a repo on your GitHub profile and its card shows up here on its own.', CW, 15)) {
       body.push(text(line, X, y + 15, { size: 15, fill: t.sub }, t)); y += 20;
     }
     y += 12;
   } else {
     body.push(text(truncate(repo.name, CW, 17, { bold: true }), X, y + 17, { size: 17, weight: 700, fill: t.link }, t));
     y += 28;
-    const desc = repo.description || 'Belum ada deskripsi';
+    const desc = repo.description || 'No description yet';
     for (const line of wrapText(desc, CW, 15, { maxLines: 4 })) {
       body.push(text(line, X, y + 15, { size: 15, fill: repo.description ? t.text : t.sub }, t)); y += 20;
     }
@@ -56,7 +56,7 @@ function renderRepoCard(data, t, index) {
       cx += w + 8; any = true;
     };
     if (repo.lang) chip(repo.lang.name, visibleOn(repo.lang.color || '#8b98a5', t.mode));
-    if (repo.archived) chip('Diarsipkan', null);
+    if (repo.archived) chip('Archived', null);
     if (any) y += 36;
 
     // baris aksi: issues, forks, stars, watchers
@@ -73,8 +73,8 @@ function renderRepoCard(data, t, index) {
   body.push(`<path d="M0 ${H - 0.5}H${W}" stroke="${t.border}" stroke-width="1"/>`);
   return svgDoc({
     w: W, h: H, t, defs,
-    title: repo ? `Repo ${repo.fullName}` : 'Slot repo kosong',
-    desc: repo ? `${repo.name}: ${repo.description || 'tanpa deskripsi'}. ${repo.stars} bintang, ${repo.forks} fork.` : 'Belum ada repo untuk slot ini.',
+    title: repo ? `Repo ${repo.fullName}` : 'Empty repo slot',
+    desc: repo ? `${repo.name}: ${repo.description || 'no description'}. ${repo.stars} stars, ${repo.forks} forks.` : 'No repo for this slot yet.',
     body: body.join(''),
   });
 }

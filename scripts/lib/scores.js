@@ -1,5 +1,5 @@
 'use strict';
-// Komponen 6: papan skor tertinggi, repo dengan bintang terbanyak ala mesin arcade.
+// Komponen 6: papan skor tertinggi (TOP SCORES), repo dengan bintang terbanyak ala mesin arcade.
 const { f, text, svgDoc, truncate, pad, wrapText } = require('./utils');
 const { icon, pixelText, pixelWidth, pixelClean } = require('./icons');
 
@@ -20,14 +20,15 @@ function renderScores(data, t) {
   const W = t.width, CX = 16, CW = W - 32;
   const top = data.top.slice(0, 5);
   const body = [];
-  const rowH = 52, headH = 76, footH = 52;
+  const sub = wrapText('Repos with the most stars. Score = stars, NEW = pushed in the last 14 days.', CW - 32, 13);
+  const rowH = 52, headH = 56 + sub.length * 18, footH = 52;
   const cardH = headH + 5 * rowH + footH;
   const H = cardH + 16;
   const css = `.bk{animation:bk 1.1s steps(1,end) infinite}@keyframes bk{0%{opacity:1}50%{opacity:.2}100%{opacity:1}}`;
 
   body.push(`<rect x="${CX}" y="8" width="${CW}" height="${cardH}" rx="${t.radius}" fill="${t.surface}"/>`);
-  body.push(pixelText('PAPAN SKOR TERTINGGI', CX + 16, 8 + 20, 2, t.gold));
-  body.push(text('Repo dengan bintang terbanyak', CX + 16, 8 + 56, { size: 13, fill: t.sub }, t));
+  body.push(pixelText('TOP SCORES', CX + 16, 8 + 20, 2, t.gold));
+  sub.forEach((l, i) => body.push(text(l, CX + 16, 8 + 52 + i * 18, { size: 13, fill: t.sub }, t)));
 
   for (let i = 0; i < 5; i++) {
     const r = top[i];
@@ -49,7 +50,7 @@ function renderScores(data, t) {
       const fresh = r.pushedAt && data.now - new Date(r.pushedAt).getTime() <= 14 * 86400000;
       if (fresh) {
         const bx = CX + 394;
-        body.push(`<g class="bk"><rect x="${bx}" y="${cy - 10}" width="56" height="20" rx="10" fill="${t.accent.red}"/>${pixelText('BARU', bx + 28, cy - 5, 2, '#ffffff', { anchor: 'middle' })}</g>`);
+        body.push(`<g class="bk"><rect x="${bx}" y="${cy - 10}" width="52" height="20" rx="10" fill="${t.accent.red}"/>${pixelText('NEW', bx + 26, cy - 5, 2, '#ffffff', { anchor: 'middle' })}</g>`);
       }
       body.push(pixelText(pad(r.stars, 6), CX + CW - 16, cy - 7, 2, ink, { anchor: 'end' }));
     } else {
@@ -58,12 +59,12 @@ function renderScores(data, t) {
   }
   const fy = 8 + headH + 5 * rowH;
   body.push(`<path d="M${CX} ${fy + 0.5}H${CX + CW}" stroke="${t.border}"/>`);
-  body.push(`<g class="bk">${pixelText('MASUKKAN KOIN', W / 2, fy + 19, 2, t.accent.red, { anchor: 'middle' })}</g>`);
+  body.push(`<g class="bk">${pixelText('INSERT COIN', W / 2, fy + 19, 2, t.accent.red, { anchor: 'middle' })}</g>`);
 
   return svgDoc({
     w: W, h: H, t, css, body: body.join(''),
-    title: 'Papan skor tertinggi',
-    desc: top.length ? 'Repo terbintang: ' + top.map((r) => `${r.name} ${r.stars}`).join(', ') : 'Belum ada repo berbintang.',
+    title: 'Top scores: repos with the most stars',
+    desc: top.length ? 'Most starred repos: ' + top.map((r) => `${r.name} ${r.stars}`).join(', ') : 'No starred repos yet.',
   });
 }
 

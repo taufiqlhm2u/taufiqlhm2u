@@ -1,6 +1,6 @@
 'use strict';
 // Komponen 1: header profil ala X (banner, avatar, tombol Follow, meta, statistik, tab bar).
-const { esc, f, text, svgDoc, textWidth, wrapText, joinedID, thousands, truncate } = require('./utils');
+const { esc, f, text, svgDoc, textWidth, wrapText, joinedID, thousands, truncate, plural } = require('./utils');
 const { icon, verifiedBadge } = require('./icons');
 
 function renderProfile(data, t) {
@@ -40,7 +40,9 @@ function renderProfile(data, t) {
   // meta: lokasi, blog, tanggal bergabung. Field kosong dilewati, baris turun kalau tidak muat.
   const meta = [];
   if (u.location) meta.push({ ic: 'pin', label: u.location, color: t.sub });
-  if (u.blog) meta.push({ ic: 'link', label: u.blog.replace(/^https?:\/\//, '').replace(/\/$/, ''), color: t.link });
+  const host = (x) => String(x || '').replace(/^https?:\/\//i, '').replace(/^www\./, '').replace(/\/$/, '').toLowerCase();
+  if (data.portfolio) meta.push({ ic: 'link', label: data.portfolio.label, color: t.link });
+  if (u.blog && !(data.portfolio && host(u.blog) === host(data.portfolio.url))) meta.push({ ic: 'link', label: u.blog.replace(/^https?:\/\//, '').replace(/\/$/, ''), color: t.link });
   const joined = joinedID(u.createdAt);
   if (joined) meta.push({ ic: 'calendar', label: joined, color: t.sub });
   y += 16;
@@ -60,14 +62,32 @@ function renderProfile(data, t) {
   const s1 = thousands(u.following), s2 = thousands(u.followers);
   body.push(text(s1, 16, y, { size: 14, weight: 700, fill: t.text }, t));
   const x1 = 16 + textWidth(s1, 14, { bold: true }) + 4;
-  body.push(text('Mengikuti', x1, y, { size: 14, fill: t.sub }, t));
-  const x2 = x1 + textWidth('Mengikuti', 14) + 20;
+  body.push(text('Following', x1, y, { size: 14, fill: t.sub }, t));
+  const x2 = x1 + textWidth('Following', 14) + 20;
   body.push(text(s2, x2, y, { size: 14, weight: 700, fill: t.text }, t));
-  body.push(text('Pengikut', x2 + textWidth(s2, 14, { bold: true }) + 4, y, { size: 14, fill: t.sub }, t));
+  body.push(text('Followers', x2 + textWidth(s2, 14, { bold: true }) + 4, y, { size: 14, fill: t.sub }, t));
+
+  // stat teks: repo, kontribusi setahun, kontribusi hari ini, streak terpanjang
+  const st = data.stats;
+  const facts = [
+    [thousands(u.publicRepos), plural(u.publicRepos, 'repo')],
+    [thousands(data.calendar.total), 'contributions in the last year'],
+    [thousands(st.today), plural(st.today, 'contribution') + ' today'],
+    [st.longest + ' ' + plural(st.longest, 'day'), 'longest streak'],
+  ];
+  y += 24;
+  let fxp = 16;
+  for (const [num, label] of facts) {
+    const w = textWidth(num, 14, { bold: true }) + 6 + textWidth(label, 14);
+    if (fxp > 16 && fxp + w > W - 16) { y += 22; fxp = 16; }
+    body.push(text(num, fxp, y, { size: 14, weight: 700, fill: t.text }, t));
+    body.push(text(label, fxp + textWidth(num, 14, { bold: true }) + 6, y, { size: 14, fill: t.sub }, t));
+    fxp += w + 20;
+  }
 
   // tab bar
   const tabTop = y + 16, tabH = 52;
-  const tabs = ['Postingan', 'Balasan', 'Sorotan', 'Media'];
+  const tabs = ['Posts', 'Replies', 'Highlights', 'Media'];
   const tw = W / tabs.length;
   tabs.forEach((label, i) => {
     const cx = i * tw + tw / 2;
@@ -82,8 +102,8 @@ function renderProfile(data, t) {
 
   return svgDoc({
     w: W, h: H, t, defs,
-    title: `Profil GitHub ${name} (@${u.login})`,
-    desc: `${name}, ${(data.bio || 'tanpa bio').replace(/\s+/g, ' ')} ${thousands(u.followers)} pengikut, ${thousands(u.following)} mengikuti.`,
+    title: `GitHub profile of ${name} (@${u.login})`,
+    desc: `${name}, ${(data.bio || 'no bio').replace(/\s+/g, ' ')} ${thousands(u.followers)} followers, ${thousands(u.following)} following. ${thousands(u.publicRepos)} repos, ${thousands(data.calendar.total)} contributions in the last year, ${thousands(st.today)} today, longest streak ${st.longest} days.`,
     body: body.join(''),
   });
 }

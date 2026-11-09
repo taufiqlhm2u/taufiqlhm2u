@@ -17,11 +17,11 @@ function renderSolar(data, t) {
   const planets = data.langs.slice(0, 8);
   const comets = st.fresh.slice(0, 4);
 
-  // judul dan subjudul
+  // judul dan subjudul menjelaskan isi grafik
   const head = [];
-  head.push(text(truncate(name, W - 32, 20, { bold: true }), 16, 36, { size: 20, weight: 800, fill: t.text }, t));
+  head.push(text('My language solar system', 16, 36, { size: 20, weight: 800, fill: t.text }, t));
   let y = 36;
-  for (const l of wrapText(data.bio || 'Belum ada bio, tata suryanya tetap jalan', W - 32, 15, { maxLines: 3 })) { y += 22; head.push(text(l, 16, y, { size: 15, fill: t.sub }, t)); }
+  for (const l of wrapText('Each planet is a language: the bigger the planet, the more code I wrote in it. Small moons count the repos using that language, and comets are repos I pushed to in the last 14 days.', W - 32, 15, { maxLines: 3 })) { y += 22; head.push(text(l, 16, y, { size: 15, fill: t.sub }, t)); }
 
   // geometri sistem
   const N = planets.length;
@@ -42,11 +42,8 @@ function renderSolar(data, t) {
   // keterangan di bawah
   const foot = [];
   let fy = sysBottom + 20;
-  foot.push(text('Planet adalah bahasaku, komet adalah push terbaru.', W / 2, fy, { size: 13, fill: t.sub, anchor: 'middle' }, t));
-  const extra = [];
-  if (N) extra.push('Bulan kecil = jumlah repo di bahasa itu');
-  if (st.archived) extra.push(`sabuk asteroid = ${st.archived} repo arsip`);
-  if (extra.length) { fy += 18; foot.push(text(extra.join(', '), W / 2, fy, { size: 12, fill: t.sub, anchor: 'middle' }, t)); }
+  foot.push(text('Planets are my languages, comets are my latest pushes.', W / 2, fy, { size: 13, fill: t.sub, anchor: 'middle' }, t));
+  if (st.archived) { fy += 18; foot.push(text(`The asteroid belt is my ${st.archived} archived ${st.archived === 1 ? 'repo' : 'repos'}.`, W / 2, fy, { size: 12, fill: t.sub, anchor: 'middle' }, t)); }
   const H = fy + 20;
 
   const defs = [], css = '.tw{animation:tw 2.6s ease-in-out infinite}@keyframes tw{0%,100%{opacity:.2}50%{opacity:.9}}';
@@ -68,7 +65,7 @@ function renderSolar(data, t) {
   // orbit. Tanpa bahasa: dua orbit putus-putus sebagai placeholder
   if (N) rxs.forEach((rx) => b.push(`<ellipse cx="${f(cx)}" cy="${f(cy)}" rx="${f(rx)}" ry="${f(rx * tilt)}" fill="none" stroke="${t.border}" stroke-width="1"/>`));
   else [R0, R0 + 50].forEach((rx) => b.push(`<ellipse cx="${f(cx)}" cy="${f(cy)}" rx="${rx}" ry="${f(rx * tilt)}" fill="none" stroke="${t.border}" stroke-dasharray="4 6"/>`));
-  if (!N) b.push(text('Belum ada bahasa yang terbaca', cx, cy + (R0 + 50) * tilt + 22, { size: 13, fill: t.sub, anchor: 'middle' }, t));
+  if (!N) b.push(text('No languages detected yet', cx, cy + (R0 + 50) * tilt + 22, { size: 13, fill: t.sub, anchor: 'middle' }, t));
 
   // sabuk asteroid di luar orbit terakhir = jumlah repo arsip
   if (st.archived) {
@@ -139,8 +136,8 @@ function renderSolar(data, t) {
   });
   b.push(`<g class="m">${mv.join('')}</g><g class="s">${sv.join('')}</g>`);
 
-  const desc = `Tata surya: ${N} bahasa sebagai planet, ${comets.length} repo yang baru di-push sebagai komet, ${st.archived} repo arsip sebagai sabuk asteroid.`;
-  return svgDoc({ w: W, h: H, t, defs: defs.join(''), css, title: `Tata surya ${name}`, desc, body: head.join('') + b.join('') + foot.join('') });
+  const desc = `Solar system of languages: ${N} languages as planets, ${comets.length} recently pushed repos as comets, ${st.archived} archived repos as an asteroid belt.`;
+  return svgDoc({ w: W, h: H, t, defs: defs.join(''), css, title: 'My language solar system', desc, body: head.join('') + b.join('') + foot.join('') });
 }
 
 module.exports = { renderSolar };

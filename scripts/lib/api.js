@@ -207,6 +207,11 @@ function buildData(raw) {
   if (i >= 0 && days[i].count === 0) i--;
   while (i >= 0 && days[i].count > 0) { streak++; i--; }
 
+  // kontribusi hari ini dan streak terpanjang dalam jendela kalender (setahun)
+  const today = days.length ? days[days.length - 1].count : 0;
+  let longest = 0, run = 0;
+  for (const d of days) { run = d.count > 0 ? run + 1 : 0; if (run > longest) longest = run; }
+
   // 26 minggu terakhir, diisi nol di depan kalau kalender lebih pendek
   const last = raw.weeks.slice(-26).map((w) => w.reduce((s, d) => s + d.count, 0));
   while (last.length < 26) last.unshift(0);
@@ -227,7 +232,7 @@ function buildData(raw) {
     langs: raw.langs,
     calendar: { total: raw.totalContributions, weeks: raw.weeks, days },
     stats: {
-      streak,
+      streak, today, longest,
       weekTotals: last,
       score: last.reduce((a, b) => a + b, 0),
       level: Math.max(1, years),
