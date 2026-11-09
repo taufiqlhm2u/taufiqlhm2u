@@ -45,7 +45,9 @@ function loadBio(data) {
   try {
     const cfg = JSON.parse(fs.readFileSync(path.join(ROOT, 'profile.config.json'), 'utf8'));
     if (cfg && typeof cfg.bio === 'string' && cfg.bio.trim()) return cfg.bio.trim();
-  } catch (e) { /* file tidak ada atau kosong, pakai bio otomatis */ }
+  } catch (e) {
+    if (e.code !== 'ENOENT') console.warn('Peringatan: profile.config.json tidak valid (' + e.message + '), pakai bio otomatis');
+  }
   return autoBio(data);
 }
 
