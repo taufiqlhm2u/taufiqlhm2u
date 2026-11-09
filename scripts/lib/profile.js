@@ -32,9 +32,9 @@ function renderProfile(data, t) {
   body.push(text('@' + u.login, 16, y, { size: 15, fill: t.sub }, t));
 
   // bio
-  if (u.bio) {
+  if (data.bio) {
     y += 12;
-    for (const line of wrapText(u.bio, W - 32, 15)) { y += 20; body.push(text(line, 16, y, { size: 15, fill: t.text }, t)); }
+    for (const line of wrapText(data.bio, W - 32, 15)) { y += 20; body.push(text(line, 16, y, { size: 15, fill: t.text }, t)); }
   }
 
   // meta: lokasi, blog, tanggal bergabung. Field kosong dilewati, baris turun kalau tidak muat.
@@ -83,7 +83,7 @@ function renderProfile(data, t) {
   return svgDoc({
     w: W, h: H, t, defs,
     title: `Profil GitHub ${name} (@${u.login})`,
-    desc: `${name}, ${u.bio || 'tanpa bio'}. ${thousands(u.followers)} pengikut, ${thousands(u.following)} mengikuti.`,
+    desc: `${name}, ${(data.bio || 'tanpa bio').replace(/\s+/g, ' ')} ${thousands(u.followers)} pengikut, ${thousands(u.following)} mengikuti.`,
     body: body.join(''),
   });
 }

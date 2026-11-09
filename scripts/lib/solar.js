@@ -21,7 +21,7 @@ function renderSolar(data, t) {
   const head = [];
   head.push(text(truncate(name, W - 32, 20, { bold: true }), 16, 36, { size: 20, weight: 800, fill: t.text }, t));
   let y = 36;
-  for (const l of wrapText(u.bio || 'Belum ada bio, tata suryanya tetap jalan', W - 32, 15, { maxLines: 3 })) { y += 22; head.push(text(l, 16, y, { size: 15, fill: t.sub }, t)); }
+  for (const l of wrapText(data.bio || 'Belum ada bio, tata suryanya tetap jalan', W - 32, 15, { maxLines: 3 })) { y += 22; head.push(text(l, 16, y, { size: 15, fill: t.sub }, t)); }
 
   // geometri sistem
   const N = planets.length;

@@ -27,6 +27,28 @@ const COMPONENTS = [
   { name: 'contributions', render: renderContributions },
 ];
 
+// Bio branding: pakai teks dari profile.config.json kalau diisi, kalau tidak dirangkai dari data GitHub.
+// Bio dari akun GitHub sengaja tidak dipakai.
+function autoBio(data) {
+  const { thousands } = require('./lib/utils');
+  const langs = data.langs.slice(0, 3).map((l) => l.name);
+  const stars = data.repos.reduce((a, r) => a + r.stars, 0);
+  const head = langs.length
+    ? 'Developer yang sehari-hari pakai ' + (langs.length > 1 ? langs.slice(0, -1).join(', ') + ' dan ' + langs[langs.length - 1] : langs[0]) + '.'
+    : 'Developer yang baru mulai mengisi portofolio.';
+  const tail = [`${thousands(data.user.publicRepos)} repo publik`];
+  if (stars) tail.push(`${thousands(stars)} bintang`);
+  tail.push(`${Math.max(1, data.stats.years)} tahun di GitHub`);
+  return head + ' ' + tail.join(', ') + '.';
+}
+function loadBio(data) {
+  try {
+    const cfg = JSON.parse(fs.readFileSync(path.join(ROOT, 'profile.config.json'), 'utf8'));
+    if (cfg && typeof cfg.bio === 'string' && cfg.bio.trim()) return cfg.bio.trim();
+  } catch (e) { /* file tidak ada atau kosong, pakai bio otomatis */ }
+  return autoBio(data);
+}
+
 function picture(name, alt) {
   return `<picture>\n  <source media="(prefers-color-scheme: light)" srcset="assets/${name}-light.svg" />\n  <img src="assets/${name}-dark.svg" width="100%" alt="${esc(alt)}" />\n</picture>`;
 }
@@ -57,6 +79,8 @@ async function main() {
   } else {
     data = await loadData(LOGIN, process.env.GITHUB_TOKEN);
   }
+
+  data.bio = loadBio(data);
 
   // banner opsional: taruh file banner.png/jpg/jpeg/webp di root repo, otomatis di-embed
   const mimes = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp' };
