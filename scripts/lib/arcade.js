@@ -196,9 +196,11 @@ function renderArcade(data, t) {
   const lbl = 'CONTRIBS ';
   b.push(pixelText(lbl, scr.x + 44, hy, 2, sc.sub));
   b.push(pixelText(String(st.score), scr.x + 44 + pixelWidth(lbl, 2), hy, 2, sc.text));
-  const cxm = scr.x + scr.w / 2 + 22;
-  b.push(pixelText('YEARS ', cxm, hy, 2, sc.sub));
-  b.push(pixelText(String(st.level), cxm + pixelWidth('YEARS ', 2), hy, 2, sc.text));
+  // blok YEARS dipusatkan tepat di tengah layar berdasarkan lebar teks sebenarnya
+  const yrsLbl = 'YEARS ', yrsVal = String(st.level);
+  const cxm = scr.x + scr.w / 2 - pixelWidth(yrsLbl + yrsVal, 2) / 2;
+  b.push(pixelText(yrsLbl, cxm, hy, 2, sc.sub));
+  b.push(pixelText(yrsVal, cxm + pixelWidth(yrsLbl, 2), hy, 2, sc.text));
   const lives = st.streak + 'D';
   const rEnd = scr.x + scr.w - 16;
   const livesW = pixelWidth(lives, 2);
