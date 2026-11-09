@@ -13,7 +13,8 @@ function renderProfile(data, t) {
     `<clipPath id="av"><circle cx="${f(avCx)}" cy="${f(avCy)}" r="${f(avR - 4)}"/></clipPath>`;
 
   // banner, lalu avatar yang menimpa tepi bawahnya
-  body.push(`<rect width="${W}" height="${bannerH}" fill="url(#bn)"/>`);
+  if (data.bannerUri) body.push(`<image href="${data.bannerUri}" width="${W}" height="${bannerH}" preserveAspectRatio="xMidYMid slice"/>`);
+  else body.push(`<rect width="${W}" height="${bannerH}" fill="url(#bn)"/>`);
   body.push(`<circle cx="${f(avCx)}" cy="${f(avCy)}" r="${f(avR)}" fill="${t.bg}"/>`);
   body.push(`<image href="${u.avatar}" x="${f(avCx - avR + 4)}" y="${f(avCy - avR + 4)}" width="${f((avR - 4) * 2)}" height="${f((avR - 4) * 2)}" clip-path="url(#av)" preserveAspectRatio="xMidYMid slice"/>`);
 

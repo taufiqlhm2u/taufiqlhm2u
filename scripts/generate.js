@@ -58,6 +58,18 @@ async function main() {
     data = await loadData(LOGIN, process.env.GITHUB_TOKEN);
   }
 
+  // banner opsional: taruh file banner.png/jpg/jpeg/webp di root repo, otomatis di-embed
+  const mimes = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp' };
+  for (const ext of Object.keys(mimes)) {
+    const bp = path.join(ROOT, 'banner.' + ext);
+    if (fs.existsSync(bp)) {
+      const buf = fs.readFileSync(bp);
+      if (buf.length > 250 * 1024) throw new Error(`banner.${ext} ${Math.round(buf.length / 1024)} KB, kecilkan sampai maks 250 KB`);
+      data.bannerUri = `data:${mimes[ext]};base64,${buf.toString('base64')}`;
+      break;
+    }
+  }
+
   const outDir = path.join(ROOT, 'assets');
   const tmpDir = path.join(outDir, '.tmp-' + process.pid);
   fs.mkdirSync(tmpDir, { recursive: true });
