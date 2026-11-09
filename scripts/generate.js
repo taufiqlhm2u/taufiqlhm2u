@@ -86,4 +86,5 @@ async function main() {
   }
 }
 
-main().catch((e) => { console.error('GAGAL:', e.message); process.exit(1); });
+main().catch((e) => { console.error('GAGAL:', e.message);
+  if (process.env.RUNNER_DEBUG === '1' || process.env.DEBUG) console.error(e.stack); process.exit(1); });
